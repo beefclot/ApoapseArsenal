@@ -179,20 +179,34 @@ namespace ApoapseArsenal
                         //Console.WriteLine($"Weapon: {weapon.Name?.String ?? "Unnamed Weapon"} -> Two Handed Skill");
                     }
 
-                    // Curved Swords
-                    if (weapon.Data != null
-                        && (weapon.Keywords.EmptyIfNull().Any(k => k.FormKey.Equals(apo_1h_sabre))
-                            || weapon.Keywords.EmptyIfNull().Any(k => k.FormKey.Equals(apo_2h_sabre)))
-                        )
+                    // Curved Swords and Katanas
+                    if (weapon.Data != null)
                     {
-                        var newWeapon = state.PatchMod.Weapons.GetOrAddAsOverride(weapon);
+                        var isCurvedSword = weapon.Keywords.EmptyIfNull().Any(k => k.FormKey.Equals(apo_1h_sabre))
+                            || weapon.Keywords.EmptyIfNull().Any(k => k.FormKey.Equals(apo_2h_sabre));
+                        var isKatana = weapon.Keywords.EmptyIfNull().Any(k => k.FormKey.Equals(apo_1h_katana))
+                            || weapon.Keywords.EmptyIfNull().Any(k => k.FormKey.Equals(apo_2h_katana));
 
-                        if (newWeapon.Keywords == null)
-                            newWeapon.Keywords = new ExtendedList<IFormLinkGetter<IKeywordGetter>>();
-                        newWeapon.Keywords.Add(WeapTypeKatana);
-                        newWeapon.Keywords.Add(apo_curved);
-                        Console.WriteLine($"Curved Sword:   {weapon.Name?.String ?? "Unnamed Weapon"}");
-                        continue;
+                        if (isCurvedSword || isKatana)
+                        {
+                            var newWeapon = state.PatchMod.Weapons.GetOrAddAsOverride(weapon);
+
+                            if (newWeapon.Keywords == null)
+                                newWeapon.Keywords = new ExtendedList<IFormLinkGetter<IKeywordGetter>>();
+
+                            if (isKatana)
+                            {
+                                newWeapon.Keywords.Add(WeapTypeKatana);
+                                Console.WriteLine($"Katana:         {weapon.Name?.String ?? "Unnamed Weapon"}");
+                            }
+                            else
+                            {
+                                newWeapon.Keywords.Add(apo_curved);
+                                Console.WriteLine($"Curved Sword:   {weapon.Name?.String ?? "Unnamed Weapon"}");
+                            }
+
+                            continue;
+                        }
                     }
 
                     // Rapiers
